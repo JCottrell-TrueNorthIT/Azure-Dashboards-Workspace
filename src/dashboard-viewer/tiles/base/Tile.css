@@ -1,0 +1,58 @@
+.tile {
+    background-color: white;
+
+    color: black;
+
+    position: absolute; 
+
+    display: flex;
+    flex-direction: column;
+
+    left: 110px;
+    top: 360px;
+ 
+    border: 1px solid #e1dfdd;
+    box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, .132), 0 .3px .9px 0 rgba(0, 0, 0, .108);
+}
+
+.contents {
+    margin-left: 15px;
+    margin-right: 15px;
+    flex: 1;
+}
+
+.tile-title {
+    padding: 15px 15px 0 15px;
+
+    /* height: 49px; */
+    position: relative;
+    top: -4px;
+    box-sizing: border-box;
+}
+
+.tile-title-text {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+    padding-bottom: 1px;
+
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: az_ea_font, "Segoe UI", az_font, system-ui, -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+.tile-title-subtext {
+    color: var(--colorTextSecondary);
+    font-size: 10px;
+    
+    line-height: 10px;
+    padding-bottom: 1px;
+    margin-top: 3px;
+    margin-bottom: 0px;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
