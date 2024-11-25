@@ -1,0 +1,11 @@
+.chart {
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    height: 80%;
+
+    .chart-img {
+        position: relative;
+
+    }
+}
