@@ -1,6 +1,6 @@
 import './App.css';
 import { ITile } from './interfaces/ITile';
-import { getDashboard } from './dashboard-viewer/services/DashboardService';
+import { DashboardService } from './dashboard-viewer/services/DashboardService';
 import { useEffect, useState } from 'react';
 import { IYamlDashboard } from './interfaces/IYamlDashboard';
 
@@ -11,7 +11,7 @@ function App() {
   const [dashboard, setDashboard] = useState<IYamlDashboard>();
 
   useEffect(() => {
-    getDashboard().then((d) => setDashboard(d));
+    DashboardService.getDashboard().then((d) => setDashboard(d));
   }, []);
 
   return (

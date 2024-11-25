@@ -4,11 +4,10 @@ export interface ITileContent {
     type: string;
 
     loadFromPartContent(partContent: IDashboardContent): void;
-    exportToPartContent(): IDashboardContent;
-
     loadInputsFromPart?(part: IDashboardPart): void;
 
-    getDashboardInputs?(): IDashboardInput[];
+    exportToPartContent(): Promise<IDashboardContent>;
+    getDashboardInputs?(): Promise<IDashboardInput[]>;
 
     copy(tileContent: ITileContent): void;
 }
