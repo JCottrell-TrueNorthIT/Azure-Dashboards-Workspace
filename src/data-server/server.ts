@@ -1,7 +1,7 @@
 import express from "express";
 
 import {AzMonitorService} from "./AzureMonitorService";
-import {getFileContents} from "./DashboardService";
+import {getFileContents, getSharedQueries} from "./DashboardService";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -41,6 +41,14 @@ app.get('/query', async(request, response) => {
 app.get('/dashboard', async(request, response) => {
   try {
     response.send(await getFileContents());
+  } catch (e: any) {
+    response.status(500).send(e.message);
+  }
+});
+
+app.get('/shared-queries', async(request, response) => {
+  try {
+    response.send(await getSharedQueries());
   } catch (e: any) {
     response.status(500).send(e.message);
   }

@@ -1,5 +1,5 @@
 
-import { getDashboardAggregationMappings } from "../../dashboard-viewer/services/DashboardService";
+import { DashboardService } from "../../dashboard-viewer/services/DashboardService";
 import { IDashboardContent } from "../IDashboard";
 import { ITileContent } from "./ITileContent";
 
@@ -18,8 +18,8 @@ export class MetricsContent implements ITileContent {
         this.aggregation = (tileContent as MetricsContent).aggregation;
     }
 
-    exportToPartContent(): IDashboardContent {
-        var mappings = getDashboardAggregationMappings().map(kvp => { return { key: kvp.value, value: kvp.key } });
+    async exportToPartContent(): Promise<IDashboardContent> {
+        var mappings = DashboardService.getDashboardAggregationMappings().map(kvp => { return { key: kvp.value, value: kvp.key } });
 
         var aggregationType = mappings.find(kvp => kvp.key === this.aggregation)?.value;
 
@@ -85,7 +85,7 @@ export class MetricsContent implements ITileContent {
         var name = chartData.name;
         var namespace = chartData.namespace;
 
-        var aggregationMappings = getDashboardAggregationMappings();
+        var aggregationMappings = DashboardService.getDashboardAggregationMappings();
 
         var aggregation = aggregationMappings.find(kvp => kvp.key === chartData?.aggregationType)?.value;
 

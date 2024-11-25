@@ -2,6 +2,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Getting Started
+1. If being used to develop Dashboard YAML, go to .gitignore and remove `/dashboard/**/*.yml` 
+2. To connect to an Azure Resource, please log in first using `azd auth login`
+
 ## Available Scripts
 
 In the project directory, you can run:

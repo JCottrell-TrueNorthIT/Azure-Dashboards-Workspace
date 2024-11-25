@@ -134,3 +134,6 @@ build
 
 # Hot Reload File
 _reload.js
+
+# REMOVE FOR DEVELOPING DEPLOYMENT YAML
+/dashboard/**/*.yml
