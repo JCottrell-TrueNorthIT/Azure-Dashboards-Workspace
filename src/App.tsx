@@ -50,9 +50,3 @@ function App() {
 }  
 
 export default App;
-
-//TODO: 
-// Make routing between two hardcoded pages work
-//
-//
-//
