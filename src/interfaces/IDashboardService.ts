@@ -2,12 +2,14 @@ import { ITileContent } from "./content/ITileContent";
 import { IDashboardPart, IDashboard } from "./IDashboard";
 import { ISharedQueries } from "./ISharedQueries";
 import { ITile } from "./ITile";
+import { ITileGroups } from "./ITileGroup";
 import { IYamlDashboard } from "./IYamlDashboard";
 
 export interface IDashboardService {
     getDashboard(): Promise<IYamlDashboard>;
     getSharedQueries(): Promise<ISharedQueries>;
-    loadDashboardFromYaml(yamlString: string): IYamlDashboard;
+    getTileGroups(): Promise<ITileGroups>;
+    loadDashboardFromYaml(yamlString: string): Promise<IYamlDashboard>;
     initTileContent(content: ITileContent): ITileContent;
     createEmptyTileContent(type: string): ITileContent;
     getTileTypeMappings(): { key: string, value: string }[];

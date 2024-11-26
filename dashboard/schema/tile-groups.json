@@ -1,0 +1,33 @@
+{
+    "title": "Azure Dashboard YAML Schema",
+    "description": "Schematic for developing Azure Dashboards in YAML",
+    "type": "object",
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "properties": {
+        "groups": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "tiles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "./dashboards.json#/definitions/Tile"
+                        }
+                    }
+                },
+                "required": [
+                    "name",
+                    "tiles"
+                ]
+            }
+        }
+    },
+    "required": [
+        "groups"
+    ]
+}
