@@ -4,7 +4,13 @@ import {AzMonitorService} from "./AzureMonitorService";
 import {getFileContents, getSharedQueries} from "./DashboardService";
 import * as dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({
+  path: ".env.local"
+});
+
+dotenv.config({
+  path: ".env"
+});
 
 const app = express()
 const port = 8000
