@@ -1,3 +1,12 @@
+# Notes for developers
+.env locally needs variables in style if REACT_APP_URI_[name]=[SLUG] where name is the name field from the .yml in upper snakecase
+
+E.g:
+In Dashboards.yml with field name being "Dashboard One"
+```
+REACT_APP_URI_DASHBOARD_ONE = "dashboard_one_dashboard" 
+```
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

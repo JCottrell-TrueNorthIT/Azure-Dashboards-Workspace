@@ -21,8 +21,22 @@ function Dashboard() {
     <div className="content">
       <base target="_blank"/>
       {
-        dashboards
-        ?.find(dashboard => dashboard.name.replace(/\s+/g, '') === params.dashboard)
+        dashboards?.find((dashboard) => {
+          const dashboardEnvName = Object.keys(process.env)
+            .filter(key => key.startsWith("REACT_APP_URI")) 
+            .find(key => process.env[key] === params.dashboard); 
+          if (dashboardEnvName) {
+            const dashboardName = dashboardEnvName
+              .replace("REACT_APP_URI_", "") 
+              .toLowerCase()
+              .split("_") 
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ");
+            console.log(dashboardName);  
+            return dashboardName === dashboard.name;  
+          }    
+          return false; 
+        })
         ?.tiles?.map((tile: ITile) => (
           <Tile tile={tile} />
         )) || <p>No dashboard found</p>
