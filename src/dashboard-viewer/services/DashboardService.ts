@@ -7,11 +7,10 @@ import { QueryContent } from "../../interfaces/content/QueryContent";
 import { IDashboard, IDashboardInput, IDashboardPart, IDashboardPosition } from "../../interfaces/IDashboard";
 import { ITile } from "../../interfaces/ITile";
 
-export async function getDashboard(): Promise<IYamlDashboard> {
+export async function getDashboards(): Promise<IYamlDashboard[]> {
   const response = await (await fetch("/dashboard", { method: "GET" })).json() as string[];
-  const dashboard = response.map(loadDashboardFromYaml) as IYamlDashboard[];
-
-  return dashboard[1];
+  const dashboards = response.map(loadDashboardFromYaml) as IYamlDashboard[];
+  return dashboards;
 }
 
 export function loadDashboardFromYaml(yamlString: string): IYamlDashboard {
