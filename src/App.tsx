@@ -16,14 +16,6 @@ function Dashboard() {
       setDashboards(d);
     });
   }, []);
-  
-  useEffect(() => {
-    console.log(dashboards);
-  }, [dashboards]);
-
-  useEffect(() => {
-    console.log(params);
-  }, [params]);
 
   return (
     <div className="content">
