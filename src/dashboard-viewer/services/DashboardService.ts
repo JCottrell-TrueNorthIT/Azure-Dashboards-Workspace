@@ -94,7 +94,7 @@ export class DashboardServiceClass implements IDashboardService {
     var tileYaml = yaml.dump(tile);
 
     for (const variable of group.variables) {
-      tileYaml = tileYaml.replaceAll(`{{${variable.name}}}`, variable.value);
+      tileYaml = tileYaml.replaceAll(`{{${variable.name}}}`, variable.value.replaceAll("\n", ""));
     }
 
     var injectedTile = yaml.load(tileYaml) as ITile;
