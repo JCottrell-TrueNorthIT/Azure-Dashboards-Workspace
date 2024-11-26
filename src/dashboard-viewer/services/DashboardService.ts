@@ -1,5 +1,5 @@
 import yaml from "js-yaml";
-import { IYamlDashboard } from "../../interfaces/IYamlDashboard";
+import { IPartialYamlDashboard, IYamlDashboard } from "../../interfaces/IYamlDashboard";
 import { ITileContent } from "../../interfaces/content/ITileContent";
 import { MarkdownContent } from "../../interfaces/content/MarkdownContent";
 import { MetricsContent } from "../../interfaces/content/MetricsContent";
@@ -8,6 +8,7 @@ import { IDashboard, IDashboardInput, IDashboardPart, IDashboardPosition } from 
 import { ITile } from "../../interfaces/ITile";
 import { ISharedQueries } from "../../interfaces/ISharedQueries";
 import { IDashboardService } from "../../interfaces/IDashboardService";
+import { IGroupedTiles, ITileGroups } from "../../interfaces/ITileGroup";
 
 export class DashboardServiceClass implements IDashboardService {
   constructor() {
@@ -24,13 +25,18 @@ export class DashboardServiceClass implements IDashboardService {
 
   async getDashboard(): Promise<IYamlDashboard> {
     const response = await (await fetch("/dashboard", { method: "GET" })).json() as string[];
-    const dashboard = response.map(this.loadDashboardFromYaml) as IYamlDashboard[];
-    return dashboard[1];
+    const dashboard = (await Promise.all(response.map(this.loadDashboardFromYaml))) as IYamlDashboard[];
+    return dashboard[0];
   }
 
   async getSharedQueries(): Promise<ISharedQueries> {
     const response = await (await fetch("/shared-queries", { method: "GET" })).text();
     return yaml.load(response) as ISharedQueries;
+  }
+
+  async getTileGroups(): Promise<ITileGroups> {
+    const response = await (await fetch("/tile-groups", { method: "GET" })).text();
+    return yaml.load(response) as ITileGroups;
   }
 
   initTileContent(content: ITileContent): ITileContent {
@@ -39,11 +45,61 @@ export class DashboardServiceClass implements IDashboardService {
     return newTileContent;
   }
 
-  loadDashboardFromYaml(yamlString: string): IYamlDashboard {
-    const yamlContent = yaml.load(yamlString) as IYamlDashboard;
+  async loadDashboardFromYaml(yamlString: string): Promise<IYamlDashboard> {
+    const partialYamlContent = yaml.load(yamlString) as IPartialYamlDashboard;
+
+    const groupedTiles = partialYamlContent.tiles.filter(t => !!(t as IGroupedTiles).groupName) as IGroupedTiles[];
+    var tilesFromGroup = this.getTilesFromGroups(groupedTiles);
+
+    var ungroupedTiles = partialYamlContent.tiles.filter(t => !(t as IGroupedTiles).groupName) as ITile[];
+
+    var allTiles: ITile[] = [...(await tilesFromGroup), ...ungroupedTiles];
+
+    const yamlContent: IYamlDashboard = {
+      name: partialYamlContent.name,
+      tiles: allTiles
+    };
 
     yamlContent.tiles.forEach(t => t.content = this.initTileContent(t.content));
     return yamlContent;
+  }
+
+  private async getTilesFromGroups(groups: IGroupedTiles[]): Promise<ITile[]> {
+    if (groups.length === 0) return [];
+
+    const tileGroups = await this.getTileGroups();
+
+    var tiles: ITile[] = []
+
+    for (const group of groups) {
+      tiles = [...tiles, ...this.getTilesFromGroup(tileGroups, group)];
+    }
+
+    return tiles;
+  }
+
+  private getTilesFromGroup(tileGroups: ITileGroups, group: IGroupedTiles): ITile[] {
+    const tileGroup = tileGroups.groups.find(g => g.name === group.groupName);
+
+    if (!tileGroup) return [];
+
+    return tileGroup.tiles.map(t => this.configureTileFromGroup(t, group));
+  }
+
+  private configureTileFromGroup(tile: ITile, group: IGroupedTiles): ITile {
+    var tileYaml = yaml.dump(tile);
+
+    for (const variable of group.variables) {
+      tileYaml = tileYaml.replace(`{{${variable.name}}}`, variable.value);
+    }
+
+    var injectedTile = yaml.load(tileYaml) as ITile;
+
+    return {
+      ...injectedTile,
+      x: group.x + injectedTile.x,
+      y: group.y + injectedTile.y
+    } as ITile;
   }
 
   createEmptyTileContent(type: string): ITileContent {
@@ -134,7 +190,7 @@ export class DashboardServiceClass implements IDashboardService {
 
     if (!emptyDashboard.properties?.lenses?.length) throw new Error("Empty dashboard not properly initialized");
 
-    emptyDashboard.properties.lenses[0].parts = await Promise.all(yamlDashboard.tiles.map(async(t) => await this.convertTileToPart(t)));
+    emptyDashboard.properties.lenses[0].parts = await Promise.all(yamlDashboard.tiles.map(async (t) => await this.convertTileToPart(t)));
 
     return emptyDashboard as IDashboard;
   }

@@ -4,12 +4,25 @@ import fs from "fs";
 import { IYamlDashboard } from "../interfaces/IYamlDashboard";
 import yaml from "js-yaml";
 import { ISharedQueries } from "../interfaces/ISharedQueries";
+import * as dotenv from "dotenv";
+import { ITileGroups } from "../interfaces/ITileGroup";
 
 export { };
 
+dotenv.config({
+    path: ".env"
+});
+
 async function getSharedQueries(): Promise<ISharedQueries> {
-    const yamlData = await fs.promises.readFile("./dashboard/shared-queries.yml", "utf8");
+    const dir = process.env["queries-file"] ?? ""
+    const yamlData = await fs.promises.readFile(dir, "utf8");
     return yaml.load(yamlData) as ISharedQueries;
+}
+
+async function getTileGroups(): Promise<ITileGroups> {
+    const dir = process.env["tile-groups-file"] ?? ""
+    const yamlData = await fs.promises.readFile(dir, "utf8");
+    return yaml.load(yamlData) as ITileGroups;
 }
 
 async function getDashboards(): Promise<IYamlDashboard[]> {
@@ -22,7 +35,7 @@ async function getDashboards(): Promise<IYamlDashboard[]> {
         const fileContent = await fs.promises.readFile(`./dashboard/dashboards/${file}`, "utf8");
         const dashboard = DashboardService.loadDashboardFromYaml(fileContent);
 
-        yamlDashboards.push(dashboard);
+        yamlDashboards.push(await dashboard);
     }
 
     return yamlDashboards;
@@ -43,6 +56,8 @@ function ensureOutFolderExists() {
 
 async function main() {
     DashboardService.getSharedQueries = getSharedQueries;
+    DashboardService.getTileGroups = getTileGroups;
+
     ensureOutFolderExists();
 
     const yamlDashboards = getDashboards();

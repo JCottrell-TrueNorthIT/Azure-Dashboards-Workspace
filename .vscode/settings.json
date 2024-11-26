@@ -1,6 +1,7 @@
 {
   "yaml.schemas": {
     "./dashboard/schema/dashboards.json": ["dashboard/dashboards/*.yml"],
-    "./dashboard/schema/queries.json": ["dashboard/queries.yml"]
+    "./dashboard/schema/queries.json": ["dashboard/queries.yml"],
+    "./dashboard/schema/tile-groups.json": ["dashboard/tile-groups.yml"]
   }
 }

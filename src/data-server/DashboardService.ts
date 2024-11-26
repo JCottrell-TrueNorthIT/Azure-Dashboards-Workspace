@@ -19,3 +19,8 @@ export async function getSharedQueries(): Promise<string> {
     const dir = process.env["queries-file"] ?? ""
     return await fs.promises.readFile(dir, "utf8");
 }
+
+export async function getTileGroups(): Promise<string> {
+    const dir = process.env["tile-groups-file"] ?? ""
+    return await fs.promises.readFile(dir, "utf8");
+}

@@ -1,7 +1,7 @@
 import express from "express";
 
 import {AzMonitorService} from "./AzureMonitorService";
-import {getFileContents, getSharedQueries} from "./DashboardService";
+import {getFileContents, getSharedQueries, getTileGroups} from "./DashboardService";
 import * as dotenv from "dotenv";
 
 dotenv.config({
@@ -55,6 +55,14 @@ app.get('/dashboard', async(request, response) => {
 app.get('/shared-queries', async(request, response) => {
   try {
     response.send(await getSharedQueries());
+  } catch (e: any) {
+    response.status(500).send(e.message);
+  }
+});
+
+app.get('/tile-groups', async(request, response) => {
+  try {
+    response.send(await getTileGroups());
   } catch (e: any) {
     response.status(500).send(e.message);
   }
