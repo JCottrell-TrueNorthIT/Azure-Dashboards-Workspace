@@ -32,7 +32,6 @@ function Dashboard() {
               .split("_") 
               .map(word => word.charAt(0).toUpperCase() + word.slice(1))
               .join(" ");
-            console.log(dashboardName);  
             return dashboardName === dashboard.name;  
           }    
           return false; 
