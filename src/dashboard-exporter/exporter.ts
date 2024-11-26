@@ -26,19 +26,18 @@ async function getTileGroups(): Promise<ITileGroups> {
 }
 
 async function getDashboards(): Promise<IYamlDashboard[]> {
-    const values = (await fs.promises.readdir("./dashboard/dashboards")).filter(f => f.endsWith(".yml"));
-    console.log(values);
+    const dir = process.env["dashboard-path"] ?? ""
 
-    var yamlDashboards: IYamlDashboard[] = [];
+    const values = (await fs.promises.readdir(dir)).filter(f => f.endsWith(".yml"));
+
+    var fileContents: string[] = [];
 
     for (const file of values) {
-        const fileContent = await fs.promises.readFile(`./dashboard/dashboards/${file}`, "utf8");
-        const dashboard = DashboardService.loadDashboardFromYaml(fileContent);
-
-        yamlDashboards.push(await dashboard);
+        const fileContent = await fs.promises.readFile(`${dir}/${file}`, "utf8");
+        fileContents.push(fileContent);
     }
 
-    return yamlDashboards;
+    return await Promise.all(fileContents.map(DashboardService.loadDashboardFromYaml));
 }
 
 async function processYamlDashboard(yamlDashboard: IYamlDashboard) {
@@ -57,6 +56,7 @@ function ensureOutFolderExists() {
 async function main() {
     DashboardService.getSharedQueries = getSharedQueries;
     DashboardService.getTileGroups = getTileGroups;
+    DashboardService.getAllDashboards = getDashboards;
 
     ensureOutFolderExists();
 

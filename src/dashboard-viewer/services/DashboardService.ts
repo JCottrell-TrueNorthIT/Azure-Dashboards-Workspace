@@ -24,9 +24,13 @@ export class DashboardServiceClass implements IDashboardService {
   }
 
   async getDashboard(): Promise<IYamlDashboard> {
+    const dashboards = await this.getAllDashboards();
+    return dashboards[0];
+  }
+
+  async getAllDashboards(): Promise<IYamlDashboard[]> {
     const response = await (await fetch("/dashboard", { method: "GET" })).json() as string[];
-    const dashboard = (await Promise.all(response.map(this.loadDashboardFromYaml))) as IYamlDashboard[];
-    return dashboard[0];
+    return (await Promise.all(response.map(this.loadDashboardFromYaml))) as IYamlDashboard[];
   }
 
   async getSharedQueries(): Promise<ISharedQueries> {
