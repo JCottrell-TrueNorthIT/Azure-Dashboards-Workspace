@@ -2,10 +2,11 @@
 .env locally needs variables in style if REACT_APP_URI_[name]=[SLUG] where name is the name field from the .yml in upper snakecase
 
 E.g:
-In Dashboards.yml with field name being "Dashboard One"
+In Dashboards.yml with field name being "Dashboard One" put this in the .env
 ```
 REACT_APP_URI_DASHBOARD_ONE = "dashboard_one_dashboard" 
 ```
+Now [localhost](http://localhost:3000/dashboard_one_dashboard) routes to Dashboard One.
 
 # Getting Started with Create React App
 
