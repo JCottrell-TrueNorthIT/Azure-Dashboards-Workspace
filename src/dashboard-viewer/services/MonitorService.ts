@@ -17,6 +17,7 @@ export async function getMetricData(metrics: MetricsContent): Promise<ITimeSerie
 
     if (!data) {
         console.error("No data returned from query: " + queryString);
+        return [];
     }
 
     const returnData:ITimeSeriesDataPoint[] = data.map((d) => {
