@@ -13,7 +13,7 @@ export class MarkdownContent implements ITileContent {
         this.markdown = partContent.content ?? "";
     }
 
-    exportToPartContent(): IDashboardContent {
+    async exportToPartContent(): Promise<IDashboardContent> {
         return {
             content: this.markdown,
             title: "",

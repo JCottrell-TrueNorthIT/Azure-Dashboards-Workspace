@@ -17,7 +17,7 @@ export class QueryContents extends TileContents<QueryContent, {data?: IQueryResp
     
     constructor(props: {content: QueryContent}) {
         super(props);
-        this.queryData = () => query(props.content.query);
+        this.queryData = () => query(props.content);
         this.state = {data: undefined};
     }
 

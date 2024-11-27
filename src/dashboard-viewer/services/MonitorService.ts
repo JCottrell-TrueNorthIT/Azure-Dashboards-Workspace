@@ -1,6 +1,8 @@
 import { MetricsContent } from "../../interfaces/content/MetricsContent";
+import { QueryContent } from "../../interfaces/content/QueryContent";
 import { IQueryResponse } from "../../interfaces/IQueryResponse";
 import { ITimeSeriesDataPoint } from "../../interfaces/Shared";
+import { DashboardService } from "./DashboardService";
 
 export async function getMetricData(metrics: MetricsContent): Promise<ITimeSeriesDataPoint[]> {
     var queryString = encodeURI("?resource=" + metrics.resource
@@ -15,6 +17,7 @@ export async function getMetricData(metrics: MetricsContent): Promise<ITimeSerie
 
     if (!data) {
         console.error("No data returned from query: " + queryString);
+        return [];
     }
 
     const returnData:ITimeSeriesDataPoint[] = data.map((d) => {
@@ -29,8 +32,24 @@ export async function getMetricData(metrics: MetricsContent): Promise<ITimeSerie
     return returnData;
 }
 
-export async function query(query: string): Promise<IQueryResponse> {
-    var queryString = encodeURI(query);
+export async function getQueryString(query: QueryContent): Promise<string> {
+    if (query.queryType === "inline") return query.query;
+
+    var sharedQueries = await DashboardService.getSharedQueries();
+
+    var queryString = sharedQueries.queries.find(q => q.name === query.query)?.query;
+
+    if (!queryString) throw new Error("Shared Query not found: " + query.query);
+    
+    for (const variable of query.variables ?? []) {
+        queryString = queryString.replace(`<${variable.name}>`, variable.value);
+    }
+
+    return queryString;
+}
+
+export async function query(query: QueryContent): Promise<IQueryResponse> {
+    var queryString = encodeURIComponent(await getQueryString(query));
     var response = await fetch(`/query?query=${queryString}`, {method: "GET"});
 
     var data = await response.json();

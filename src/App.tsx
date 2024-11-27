@@ -1,6 +1,6 @@
 import './App.css';
 import { ITile } from './interfaces/ITile';
-import { getDashboards } from './dashboard-viewer/services/DashboardService';
+import { DashboardService } from './dashboard-viewer/services/DashboardService';
 import { useEffect, useState } from 'react';
 import { IYamlDashboard } from './interfaces/IYamlDashboard';
 import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
@@ -12,9 +12,7 @@ function Dashboard() {
   const [dashboards, setDashboards] = useState<IYamlDashboard[]>()
   const params = useParams();
   useEffect(() => {
-    getDashboards().then((dashboards) => {
-      setDashboards(dashboards);
-    });
+    DashboardService.getDashboard().then((d) => setDashboard(d));
   }, []);
 
   return (

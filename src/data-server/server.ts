@@ -1,10 +1,16 @@
 import express from "express";
 
 import {AzMonitorService} from "./AzureMonitorService";
-import {getFileContents} from "./DashboardService";
+import {getFileContents, getSharedQueries, getTileGroups} from "./DashboardService";
 import * as dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({
+  path: ".env.local"
+});
+
+dotenv.config({
+  path: ".env"
+});
 
 const app = express()
 const port = 8000
@@ -41,6 +47,22 @@ app.get('/query', async(request, response) => {
 app.get('/dashboard', async(request, response) => {
   try {
     response.send(await getFileContents());
+  } catch (e: any) {
+    response.status(500).send(e.message);
+  }
+});
+
+app.get('/shared-queries', async(request, response) => {
+  try {
+    response.send(await getSharedQueries());
+  } catch (e: any) {
+    response.status(500).send(e.message);
+  }
+});
+
+app.get('/tile-groups', async(request, response) => {
+  try {
+    response.send(await getTileGroups());
   } catch (e: any) {
     response.status(500).send(e.message);
   }

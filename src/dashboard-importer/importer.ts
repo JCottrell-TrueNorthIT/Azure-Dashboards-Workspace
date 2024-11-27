@@ -4,7 +4,7 @@ import {IDashboard} from "../interfaces/IDashboard";
 import {IYamlDashboard} from "../interfaces/IYamlDashboard";
 import yaml from "js-yaml";
 import { resolve } from "path";
-import { convertPartToTile } from "../dashboard-viewer/services/DashboardService";
+import { DashboardService } from "../dashboard-viewer/services/DashboardService";
 
 export {};
 
@@ -24,10 +24,8 @@ async function loadJson<T>(file: string): Promise<T> {
     return data;
 }
 
-async function main() {
-    const [inputDir, outputDir] = getInputOutputDirs();
-    var data = await loadJson<IDashboard>(inputDir);
-    const parts = data.properties.lenses[0].parts.map(part => convertPartToTile(part));
+async function saveYaml(outputDir:string, data: IDashboard) {
+    const parts = data.properties.lenses[0].parts.map(part => DashboardService.convertPartToTile(part));
 
     const dashboard: IYamlDashboard = {
         name: data.name,
@@ -37,6 +35,32 @@ async function main() {
     const yamlContent = yaml.dump(dashboard);
 
     await fs.promises.writeFile(resolve(outputDir, `${dashboard.name}.yml`), yamlContent);
+
+}
+
+async function loadDashboards(inputDir: string): Promise<IDashboard[]> {
+    if (fs.lstatSync(inputDir).isFile()) return [await loadJson<IDashboard>(inputDir)];
+
+    const values = (await fs.promises.readdir(inputDir)).filter(f => f.endsWith(".json"));
+
+    var dashboards: IDashboard[] = [];
+
+    for (const file of values) {
+        const fileContent = await loadJson<IDashboard>(resolve(inputDir, file));
+        dashboards.push(fileContent);
+    }
+
+    return dashboards;
+}
+
+async function main() {
+    const [inputDir, outputDir] = getInputOutputDirs();
+
+    const dashboards = await loadDashboards(inputDir);
+
+    for (const dashboard of dashboards) {
+        await saveYaml(outputDir, dashboard);
+    }
 }
 
 main();

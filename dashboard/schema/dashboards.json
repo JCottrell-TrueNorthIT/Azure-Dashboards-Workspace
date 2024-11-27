@@ -5,6 +5,77 @@
     "additionalProperties": false,
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
+        "TileGroup": {
+            "type": "object",
+            "properties": {
+                "groupName": {
+                    "type": "string"
+                },
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                },
+                "variables": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "value"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "groupName",
+                "x",
+                "y",
+                "variables"
+            ]
+        },
+        "Tile": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "subtitle": {
+                    "type": "string"
+                },
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                },
+                "columnsWidth": {
+                    "type": "number"
+                },
+                "rowsHeight": {
+                    "type": "number"
+                },
+                "content": {
+                    "$ref": "#/definitions/Content"
+                }
+            },
+            "required": [
+                "x",
+                "y",
+                "columnsWidth",
+                "rowsHeight",
+                "content"
+            ]
+        },
         "Content": {
             "oneOf": [
                 {
@@ -18,7 +89,7 @@
                 }
             ]
         },
-        "QueryContent":{
+        "QueryContent": {
             "type": "object",
             "properties": {
                 "type": {
@@ -27,10 +98,44 @@
                         "query"
                     ]
                 },
+                "resourceId": {
+                    "type": "string"
+                },
+                "queryType": {
+                    "type": "string",
+                    "enum": [
+                        "inline",
+                        "shared"
+                    ]
+                },
                 "query": {
                     "type": "string"
+                },
+                "variables": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "value"
+                        ]
+                    }
                 }
-            }
+            },
+            "required": [
+                "type",
+                "resourceId",
+                "queryType",
+                "query"
+            ]
         },
         "MarkdownContent": {
             "type": "object",
@@ -73,7 +178,11 @@
                 }
             },
             "required": [
-                "type", "resource", "namespace", "name", "aggregation"
+                "type",
+                "resource",
+                "namespace",
+                "name",
+                "aggregation"
             ]
         }
     },
@@ -84,36 +193,13 @@
         "tiles": {
             "type": "array",
             "items": {
-                "type": "object",
-                "properties": {
-                    "title": {
-                        "type": "string"
+                "oneOf": [
+                    {
+                        "$ref": "#/definitions/Tile"
                     },
-                    "subtitle": {
-                        "type": "string"
-                    },
-                    "x": {
-                        "type": "number"
-                    },
-                    "y": {
-                        "type": "number"
-                    },
-                    "columnsWidth": {
-                        "type": "number"
-                    },
-                    "rowsHeight": {
-                        "type": "number"
-                    },
-                    "content": {
-                        "$ref": "#/definitions/Content"
+                    {
+                        "$ref": "#/definitions/TileGroup"
                     }
-                },
-                "required": [
-                    "x",
-                    "y",
-                    "columnsWidth",
-                    "rowsHeight",
-                    "content"
                 ]
             }
         }
