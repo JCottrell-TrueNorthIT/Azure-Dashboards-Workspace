@@ -35,8 +35,8 @@ export class Tile extends React.Component< TileProps > {
         return (
             <div className="tile" style={
                 {
-                    height: this.props.tile.rowsHeight * 88, 
-                    width: this.props.tile.columnsWidth * 89, 
+                    height: this.props.tile.rowsHeight * 90 - 5, 
+                    width: this.props.tile.columnsWidth * 90 - 5, 
                     left: this.props.tile.x * 90, 
                     top: this.props.tile.y * 90
                     }}>

@@ -1,6 +1,7 @@
-import { MetricsListOptionalParams, MonitorClient } from "@azure/arm-monitor";
-import { LogsQueryClient } from "@azure/monitor-query"
+import { MetricsListOptionalParams, MetricsListResponse, MonitorClient } from "@azure/arm-monitor";
+import { LogsQueryClient, LogsQueryResult } from "@azure/monitor-query"
 import { AzureDeveloperCliCredential } from "@azure/identity";
+import { Cache } from "./Cache";
 
 export class AzMonitorService {
     private monitorClient: MonitorClient;
@@ -10,6 +11,9 @@ export class AzMonitorService {
     private appiResource: string;
 
     private daysToQuery: number;
+
+    private metricCache: Cache<MetricsListResponse>;
+    private queryCache: Cache<LogsQueryResult>;
 
     constructor() {
         this.subscription = process.env.subscription || "ERROR";
@@ -23,9 +27,23 @@ export class AzMonitorService {
         const credential = new AzureDeveloperCliCredential();
         this.monitorClient = new MonitorClient(credential, this.subscription);
         this.logsQueryClient = new LogsQueryClient(credential);
+
+        this.metricCache = new Cache<MetricsListResponse>();
+        this.queryCache = new Cache<LogsQueryResult>();
     }
     
-    async getMetrics(resource: string, metricName: string, metricNamespace: string, interval: string, aggregation: string) {
+    async getMetrics(
+        resource: string, 
+        metricName: string, 
+        metricNamespace: string, 
+        interval: string, 
+        aggregation: string): Promise<MetricsListResponse> {
+        
+        const cacheKey = `${resource};${metricName};${metricNamespace}${interval}${aggregation}`
+        const cache = this.metricCache.get(cacheKey);
+
+        if (cache) return cache;
+
         const endDate = new Date();
         const startDate = new Date();
         startDate.setDate(endDate.getDate() - this.daysToQuery);
@@ -39,18 +57,27 @@ export class AzMonitorService {
             timespan: startDate.toISOString() + "/" + endDate.toISOString()
         } as MetricsListOptionalParams);
         
+        this.metricCache.set(cacheKey, metrics);
+
         return metrics;
     }
 
-    async query(query: string) {
+    async query(query: string): Promise<LogsQueryResult> {
         const endDate = new Date();
         const startDate = new Date();
         startDate.setDate(endDate.getDate() - this.daysToQuery);
+
+        const cache = this.queryCache.get(query);
+
+        if (cache) return cache;
 
         const response = await this.logsQueryClient.queryResource(this.appiResource, query, {
             startTime: startDate,
             endTime: endDate
         });
+
+        this.queryCache.set(query, response);
+
         return response;
     }
 
