@@ -10,14 +10,9 @@ import { ISharedQueries } from "../../interfaces/ISharedQueries";
 import { IDashboardService } from "../../interfaces/IDashboardService";
 import { IGroupedTiles, ITileGroups } from "../../interfaces/ITileGroup";
 
-export async function getDashboards(): Promise<IYamlDashboard[]> {
-  const response = await (await fetch("/dashboard", { method: "GET" })).json() as string[];
-  const dashboards = response.map(loadDashboardFromYaml) as IYamlDashboard[];
-  return dashboards;
-}
 export class DashboardServiceClass implements IDashboardService {
   constructor() {
-    this.getDashboard = this.getDashboard.bind(this);
+    this.getDashboards = this.getDashboards.bind(this);
     this.getSharedQueries = this.getSharedQueries.bind(this);
     this.loadDashboardFromYaml = this.loadDashboardFromYaml.bind(this);
     this.initTileContent = this.initTileContent.bind(this);
@@ -28,47 +23,24 @@ export class DashboardServiceClass implements IDashboardService {
     this.createEmptyDashboard = this.createEmptyDashboard.bind(this);
   }
 
-  async getDashboard(): Promise<IYamlDashboard> {
-    const dashboards = await this.getAllDashboards();
-    return dashboards[0];
-  }
-
-export function loadDashboardFromYaml(yamlString: string): IYamlDashboard {
-  const yamlContent = yaml.load(yamlString) as IYamlDashboard;
-  
-  const dashboardEnvNames = Object.keys(process.env)
-            .filter(key => key.startsWith("REACT_APP_URI"));
-  async getAllDashboards(): Promise<IYamlDashboard[]> {
+  async getDashboards(): Promise<IYamlDashboard[]> {
     const response = await (await fetch("/dashboard", { method: "GET" })).json() as string[];
-    return (await Promise.all(response.map(this.loadDashboardFromYaml))) as IYamlDashboard[];
+    return (await Promise.all(response.map(this.injectDashboardUrls).map(this.loadDashboardFromYaml))) as IYamlDashboard[];
   }
 
-  yamlContent.tiles.forEach(t => 
-    t.content = insertEnvUriToTile(dashboardEnvNames,initTileContent(t.content))
-  );
-  async getSharedQueries(): Promise<ISharedQueries> {
-    const response = await (await fetch("/shared-queries", { method: "GET" })).text();
-    return yaml.load(response) as ISharedQueries;
-  }
+  private injectDashboardUrls(yamlString: string): string {
+    const urlRegex = /\{\{REACT_APP_URI:([^}]+)\}\}/g;
 
-  async getTileGroups(): Promise<ITileGroups> {
-    const response = await (await fetch("/tile-groups", { method: "GET" })).text();
-    return yaml.load(response) as ITileGroups;
-  }
+    var m;
+    do {
+      m = urlRegex.exec(yamlString);
+      if (!m || !m[1]) continue;
+      
+      yamlString = yamlString.replaceAll(m[0], m[1].replaceAll(" ", "-"));
 
-export function insertEnvUriToTile(dashboardEnvNames: string[], content: ITileContent): ITileContent {
-  if (content.type == "markdown") {
-    const markdownContent = content as MarkdownContent;
-    for (const dashboardEnvName of dashboardEnvNames) {
-      markdownContent.markdown = markdownContent.markdown.replaceAll(`{{${dashboardEnvName}}}`, process.env[dashboardEnvName] || "");
-    }
-  }
-  return content;           
-}
-  initTileContent(content: ITileContent): ITileContent {
-    const newTileContent = this.createEmptyTileContent(content.type);
-    newTileContent.copy(content);
-    return newTileContent;
+    } while (m);
+
+    return yamlString;
   }
 
   async loadDashboardFromYaml(yamlString: string): Promise<IYamlDashboard> {
@@ -83,11 +55,38 @@ export function insertEnvUriToTile(dashboardEnvNames: string[], content: ITileCo
 
     const yamlContent: IYamlDashboard = {
       name: partialYamlContent.name,
+      isMain: partialYamlContent.isMain,
       tiles: allTiles
     };
 
     yamlContent.tiles.forEach(t => t.content = this.initTileContent(t.content));
     return yamlContent;
+  }
+
+  async getSharedQueries(): Promise<ISharedQueries> {
+    const response = await (await fetch("/shared-queries", { method: "GET" })).text();
+    return yaml.load(response) as ISharedQueries;
+  }
+
+  async getTileGroups(): Promise<ITileGroups> {
+    const response = await (await fetch("/tile-groups", { method: "GET" })).text();
+    return yaml.load(response) as ITileGroups;
+  }
+
+  insertEnvUriToTile(dashboardEnvNames: string[], content: ITileContent): ITileContent {
+    if (content.type == "markdown") {
+      const markdownContent = content as MarkdownContent;
+      for (const dashboardEnvName of dashboardEnvNames) {
+        markdownContent.markdown = markdownContent.markdown.replaceAll(`{{${dashboardEnvName}}}`, process.env[dashboardEnvName] || "");
+      }
+    }
+    return content;
+  }
+
+  initTileContent(content: ITileContent): ITileContent {
+    const newTileContent = this.createEmptyTileContent(content.type);
+    newTileContent.copy(content);
+    return newTileContent;
   }
 
   private async getTilesFromGroups(groups: IGroupedTiles[]): Promise<ITile[]> {

@@ -56,7 +56,7 @@ function ensureOutFolderExists() {
 async function main() {
     DashboardService.getSharedQueries = getSharedQueries;
     DashboardService.getTileGroups = getTileGroups;
-    DashboardService.getAllDashboards = getDashboards;
+    DashboardService.getDashboards = getDashboards;
 
     ensureOutFolderExists();
 
