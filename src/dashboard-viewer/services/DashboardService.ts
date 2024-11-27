@@ -17,6 +17,17 @@ export function loadDashboardFromYaml(yamlString: string): IYamlDashboard {
   const yamlContent = yaml.load(yamlString) as IYamlDashboard;
 
   yamlContent.tiles.forEach(t => t.content = initTileContent(t.content));
+  const dashboardEnvNames = Object.keys(process.env)
+            .filter(key => key.startsWith("REACT_APP_URI")); 
+
+  for (const tile of yamlContent.tiles) {
+    if (tile.content.type == "markdown") {
+      const markdownContent = tile.content as MarkdownContent;
+      for (const dashboardEnvName of dashboardEnvNames) {
+        markdownContent.markdown = markdownContent.markdown.replaceAll(`{{${dashboardEnvName}}}`, process.env[dashboardEnvName] || "");
+      }
+    }
+  }
 
   return yamlContent;
 }
