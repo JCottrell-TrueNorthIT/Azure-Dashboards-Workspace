@@ -6,8 +6,7 @@ import { ITileGroups } from "./ITileGroup";
 import { IYamlDashboard } from "./IYamlDashboard";
 
 export interface IDashboardService {
-    getDashboard(): Promise<IYamlDashboard>;
-    getAllDashboards(): Promise<IYamlDashboard[]>;
+    getDashboards(): Promise<IYamlDashboard[]>;
     getSharedQueries(): Promise<ISharedQueries>;
     getTileGroups(): Promise<ITileGroups>;
     loadDashboardFromYaml(yamlString: string): Promise<IYamlDashboard>;

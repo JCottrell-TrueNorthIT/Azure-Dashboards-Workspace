@@ -190,6 +190,9 @@
         "name": {
             "type": "string"
         },
+        "isMain": {
+            "type": "boolean"
+        },
         "tiles": {
             "type": "array",
             "items": {
