@@ -12,8 +12,8 @@ function Dashboard() {
   const [dashboards, setDashboards] = useState<IYamlDashboard[]>()
   const params = useParams();
   useEffect(() => {
-    getDashboards().then((d) => {
-      setDashboards(d);
+    getDashboards().then((dashboards) => {
+      setDashboards(dashboards);
     });
   }, []);
 
