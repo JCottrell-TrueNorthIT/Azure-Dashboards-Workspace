@@ -1,6 +1,6 @@
 import fs from "fs";
 
-function injectVariablesIntoDashboard(yamlContent: string): string {
+function injectVariablesIntoYaml(yamlContent: string): string {
     var variables = Object.keys(process.env).filter(k => k.startsWith("ENV_")).map(k => ({ name: k, value: process.env[k] }));
 
     for (const variable of variables) {
@@ -22,19 +22,19 @@ export async function getFileContents(): Promise<string[]> {
         contents.push(fileContent);
     }
 
-    return contents.map(injectVariablesIntoDashboard);
+    return contents.map(injectVariablesIntoYaml);
 }
 
 export async function getSharedQueries(): Promise<string> {
     const dir = process.env["queries-file"] ?? ""
     const queries = await fs.promises.readFile(dir, "utf8");
 
-    return injectVariablesIntoDashboard(queries);
+    return injectVariablesIntoYaml(queries);
 }
 
 export async function getTileGroups(): Promise<string> {
     const dir = process.env["tile-groups-file"] ?? ""
     const groups = await fs.promises.readFile(dir, "utf8");
 
-    return injectVariablesIntoDashboard(groups);
+    return injectVariablesIntoYaml(groups);
 }
