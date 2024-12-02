@@ -47,11 +47,11 @@ export class DashboardServiceClass implements IDashboardService {
     const partialYamlContent = yaml.load(yamlString) as IPartialYamlDashboard;
 
     const groupedTiles = partialYamlContent.tiles.filter(t => !!(t as IGroupedTiles).groupName) as IGroupedTiles[];
-    var tilesFromGroup = this.getTilesFromGroups(groupedTiles);
+    var tilesFromGroup = await this.getTilesFromGroups(groupedTiles);
 
     var ungroupedTiles = partialYamlContent.tiles.filter(t => !(t as IGroupedTiles).groupName) as ITile[];
 
-    var allTiles: ITile[] = [...(await tilesFromGroup), ...ungroupedTiles];
+    var allTiles: ITile[] = [...tilesFromGroup, ...ungroupedTiles];
 
     const yamlContent: IYamlDashboard = {
       name: partialYamlContent.name,
