@@ -193,6 +193,9 @@
         "isMain": {
             "type": "boolean"
         },
+        "timeRange":{
+            "type": "string"
+        },
         "tiles": {
             "type": "array",
             "items": {

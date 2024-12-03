@@ -35,7 +35,7 @@ export class DashboardServiceClass implements IDashboardService {
     do {
       m = urlRegex.exec(yamlString);
       if (!m || !m[1]) continue;
-      
+
       yamlString = yamlString.replaceAll(m[0], m[1].replaceAll(" ", "-"));
 
     } while (m);
@@ -56,6 +56,7 @@ export class DashboardServiceClass implements IDashboardService {
     const yamlContent: IYamlDashboard = {
       name: partialYamlContent.name,
       isMain: partialYamlContent.isMain,
+      timeRange: partialYamlContent.timeRange,
       tiles: allTiles
     };
 
@@ -217,7 +218,52 @@ export class DashboardServiceClass implements IDashboardService {
 
     emptyDashboard.properties.lenses[0].parts = await Promise.all(yamlDashboard.tiles.map(async (t) => await this.convertTileToPart(t)));
 
+    if (yamlDashboard.timeRange) {
+      emptyDashboard.properties.metadata.model.filters.value.MsPortalFx_TimeRange.model.relative = yamlDashboard.timeRange;
+      emptyDashboard.properties.metadata.model.filters.value.MsPortalFx_TimeRange.displayCache = this.getTimeRangeDisplayCache(yamlDashboard.timeRange);
+    }
+
     return emptyDashboard as IDashboard;
+  }
+
+  private getTimeRangeDisplayCache(timeRange: string): { name: string, value: string} {
+    var value = "";
+
+    switch (timeRange) {
+      case "30m":
+        value = "Past 30 minutes";
+        break;
+      case "1h":
+        value = "Past hour";
+        break;
+      case "4h":
+        value = "Past 4 hours";
+        break;
+      case "12h":
+        value = "Past 12 hours";
+        break;
+      case "48h":
+        value = "Past 48 hours";
+        break;
+      case "3d":
+        value = "Past 3 days";
+        break;
+      case "7d":
+        value = "Past 7 days";
+        break;
+      case "30d":
+        value = "Past 30 days";
+        break;
+      case "24h":
+      default:
+        value = "Past 24 hours";
+        break;
+    }
+
+    return {
+      name: "UTC Time",
+      value: value
+    }
   }
 
   createEmptyDashboard(): Partial<IDashboard> {
