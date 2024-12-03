@@ -1,5 +1,7 @@
 import fs from "fs";
 import {glob} from "glob";
+import { resolve } from "path";
+import { IDashboard } from "../interfaces/IDashboard";
 
 export async function getSharedQueries(): Promise<string> {
     const dir = process.env["queries-file"] ?? ""
@@ -36,4 +38,16 @@ export function injectVariablesIntoYaml(yamlContent: string): string {
     }
 
     return yamlContent;
+}
+
+export async function exportDashboardJSON(dashboard: IDashboard) {
+    const dir = process.env["build-dir"] ?? "./build"
+
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
+
+    const jsonContent = JSON.stringify(dashboard, null, 2);
+    
+    await fs.promises.writeFile(resolve(dir, `${dashboard.name}.json`), jsonContent);
 }

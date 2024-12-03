@@ -17,15 +17,7 @@ dotenv.config({
 
 async function processYamlDashboard(yamlDashboard: IYamlDashboard) {
     const dashboard = await DashboardService.createDashboardFromYaml(yamlDashboard);
-    const jsonContent = JSON.stringify(dashboard, null, 2);
-
-    await fs.promises.writeFile(resolve("./build", `${dashboard.name}.json`), jsonContent);
-}
-
-function ensureOutFolderExists() {
-    if (!fs.existsSync("./build")) {
-        fs.mkdirSync("./build");
-    }
+    await FileService.exportDashboardJSON(dashboard);
 }
 
 async function main() {
@@ -33,8 +25,6 @@ async function main() {
     DashboardService.getTileGroups = async() => yaml.load(await FileService.getTileGroups()) as ITileGroups;
     DashboardService.getDashboards = async() => await Promise.all((await FileService.getDashboards())
             .map(DashboardService.loadDashboardFromYaml));
-
-    ensureOutFolderExists();
 
     const yamlDashboards = await DashboardService.getDashboards();
 
