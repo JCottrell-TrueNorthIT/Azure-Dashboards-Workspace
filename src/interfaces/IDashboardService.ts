@@ -10,7 +10,7 @@ export interface IDashboardService {
     getSharedQueries(): Promise<ISharedQueries>;
     getTileGroups(): Promise<ITileGroups>;
     loadDashboardFromYaml(yamlString: string): Promise<IYamlDashboard>;
-    initTileContent(content: ITileContent): ITileContent;
+    initTileContent(tile: ITile): ITileContent;
     createEmptyTileContent(type: string): ITileContent;
     getTileTypeMappings(): { key: string, value: string }[];
     getDashboardAggregationMappings(): { key: number, value: string }[];

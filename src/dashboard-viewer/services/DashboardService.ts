@@ -60,7 +60,7 @@ export class DashboardServiceClass implements IDashboardService {
       tiles: allTiles
     };
 
-    yamlContent.tiles.forEach(t => t.content = this.initTileContent(t.content));
+    yamlContent.tiles.forEach(t => t.content = this.initTileContent(t));
     return yamlContent;
   }
 
@@ -84,9 +84,10 @@ export class DashboardServiceClass implements IDashboardService {
     return content;
   }
 
-  initTileContent(content: ITileContent): ITileContent {
-    const newTileContent = this.createEmptyTileContent(content.type);
-    newTileContent.copy(content);
+  initTileContent(tile: ITile): ITileContent {
+    const newTileContent = this.createEmptyTileContent(tile.content.type);
+    newTileContent.copy(tile.content);
+    newTileContent.parent = tile;
     return newTileContent;
   }
 
@@ -199,7 +200,7 @@ export class DashboardServiceClass implements IDashboardService {
     let title = partContent.title || partContent.PartTitle || part.metadata.partHeader?.title;
     let subtitle = partContent.subtitle || partContent.PartSubTitle || part.metadata.partHeader?.subtitle;
 
-    return {
+    const tile =  {
       title: title,
       subtitle: subtitle,
       x: position.x,
@@ -208,6 +209,10 @@ export class DashboardServiceClass implements IDashboardService {
       rowsHeight: position.rowSpan,
       content: content
     };
+
+    content.parent = tile;
+
+    return tile;
   }
 
   async createDashboardFromYaml(yamlDashboard: IYamlDashboard): Promise<IDashboard> {

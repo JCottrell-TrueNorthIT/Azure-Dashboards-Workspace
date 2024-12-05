@@ -1,6 +1,8 @@
 import { IDashboardContent, IDashboardInput, IDashboardPart } from "../IDashboard";
+import { ITile } from "../ITile";
 
 export interface ITileContent {
+    parent?: ITile;
     type: string;
 
     loadFromPartContent(partContent: IDashboardContent): void;

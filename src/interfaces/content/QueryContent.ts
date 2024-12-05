@@ -1,5 +1,6 @@
 import { getQueryString } from "../../dashboard-viewer/services/MonitorService";
 import { IDashboardContent, IDashboardInput, IDashboardPart } from "../IDashboard";
+import { ITile } from "../ITile";
 import { ITileContent } from "./ITileContent";
 
 export interface QueryVariable {
@@ -8,22 +9,19 @@ export interface QueryVariable {
 }
 
 export class QueryContent implements ITileContent {
+    parent?: ITile;
     public readonly type = "query";
     public queryType!: "inline" | "shared";
     public query!: string;
 
     public variables?: QueryVariable[];
 
-    public title!: string;
-    public subtitle!: string;
     public resourceId!: string;
 
     copy(tileContent: ITileContent): void {
         this.queryType = (tileContent as QueryContent).queryType;
         this.query = (tileContent as QueryContent).query;
         this.variables = (tileContent as QueryContent).variables;
-        this.title = (tileContent as QueryContent).title;
-        this.subtitle = (tileContent as QueryContent).subtitle;
         this.resourceId = (tileContent as QueryContent).resourceId;
     }
 
@@ -47,15 +45,13 @@ export class QueryContent implements ITileContent {
     loadFromPartContent(partContent: IDashboardContent): void {
         this.queryType = "inline";
         this.query = partContent.Query ?? "";
-        this.title = partContent.PartTitle ?? "";
-        this.subtitle = partContent.PartSubTitle ?? "";
     }
 
     async exportToPartContent(): Promise<IDashboardContent> {
         return {
             content: this.query,
-            PartTitle: this.title,
-            PartSubTitle: this.subtitle,
+            PartTitle: this.parent?.title ?? "",
+            PartSubTitle: this.parent?.subtitle ?? "",
         }
     }
 
@@ -85,12 +81,12 @@ export class QueryContent implements ITileContent {
         return [
             {
                 name: "PartTitle",
-                value: this.title,
+                value: this.parent?.title ?? "",
                 isOptional: true
             },
             {
                 name: "PartSubTitle",
-                value: this.subtitle,
+                value: this.parent?.subtitle ?? "",
                 isOptional: true
             },
             {
