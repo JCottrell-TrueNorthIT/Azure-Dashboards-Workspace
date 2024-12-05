@@ -1,9 +1,11 @@
 
 import { DashboardService } from "../../dashboard-viewer/services/DashboardService";
 import { IDashboardContent } from "../IDashboard";
+import { ITile } from "../ITile";
 import { ITileContent } from "./ITileContent";
 
 export class MetricsContent implements ITileContent {
+    parent?: ITile;
     public readonly type = "metrics";
 
     public resource!: string;
@@ -46,7 +48,7 @@ export class MetricsContent implements ITileContent {
                             aggregationType: aggregationType ?? 1
                         }
                     ],
-                    title: "",
+                    title: this.parent?.title ?? "",
                     titleKind: 0,
                     visualization: {
                         chartType: 2,
