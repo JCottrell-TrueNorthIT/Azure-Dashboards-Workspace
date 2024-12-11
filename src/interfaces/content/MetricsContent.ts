@@ -1,6 +1,6 @@
 
 import { DashboardService } from "../../dashboard-viewer/services/DashboardService";
-import { IDashboardContent } from "../IDashboard";
+import { IDashboardContent, IMetricFilter } from "../IDashboard";
 import { ITile } from "../ITile";
 import { ITileContent } from "./ITileContent";
 
@@ -12,12 +12,14 @@ export class MetricsContent implements ITileContent {
     public namespace!: string;
     public name!: string;
     public aggregation!: string;
+    public filters!: {key: string, value: string}[];
 
     copy(tileContent: ITileContent): void {
         this.resource = (tileContent as MetricsContent).resource;
         this.namespace = (tileContent as MetricsContent).namespace;
         this.name = (tileContent as MetricsContent).name;
         this.aggregation = (tileContent as MetricsContent).aggregation;
+        this.filters = (tileContent as MetricsContent).filters;
     }
 
     async exportToPartContent(): Promise<IDashboardContent> {
@@ -35,7 +37,7 @@ export class MetricsContent implements ITileContent {
             name =`customMetrics/${name}`
         }
 
-        return {
+        const dashboardContent: IDashboardContent = {
             options: {
                 chart: {
                     metrics: [
@@ -73,6 +75,20 @@ export class MetricsContent implements ITileContent {
                 }
             }
         }
+        if (this.filters?.length && dashboardContent.options) {
+            dashboardContent.options.chart.filterCollection = {
+                filters: this.filters.map(f => {
+                    return {
+                        key: f.key,
+                        operator: 0,
+                        values: [
+                            f.value
+                        ]
+                    }
+                })
+            }
+        }
+        return dashboardContent;
     }
 
     loadFromPartContent(partContent: IDashboardContent): void {
