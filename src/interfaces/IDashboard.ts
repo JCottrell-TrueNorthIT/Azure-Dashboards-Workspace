@@ -68,9 +68,18 @@ export interface IDashboard {
   export interface IDashboardChartOptions {
     chart: IDashboardChart;
   }
+
+  export interface IMetricFilter {
+    key: string;
+    operator: number;
+    values: string[]
+  }
   
   export interface IDashboardChart {
     metrics: IDashboardMetric[];
+    filterCollection?: {
+      filters: IMetricFilter[]
+    }
     title: string;
     titleKind: number;
     visualization: IDashboardVisualization;
