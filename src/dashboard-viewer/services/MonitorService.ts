@@ -13,7 +13,7 @@ export async function getMetricData(metrics: MetricsContent): Promise<ITimeSerie
 
     var response = await fetch(`/metrics${queryString}`, {method: "GET"});
     
-    var data: {timeStamp:string, total?:number }[] = (await response.json())?.value[0]?.timeseries[0]?.data;
+    var data: any[] = (await response.json())?.value[0]?.timeseries[0]?.data;
 
     if (!data) {
         console.error("No data returned from query: " + queryString);
@@ -23,7 +23,7 @@ export async function getMetricData(metrics: MetricsContent): Promise<ITimeSerie
     const returnData:ITimeSeriesDataPoint[] = data.map((d) => {
         return {
         x: new Date(d.timeStamp).getTime(),
-        y: d.total ?? 0,
+        y: d[metrics.aggregation.toLowerCase()] ?? 0,
         xLabel: d.timeStamp
         }
     });
