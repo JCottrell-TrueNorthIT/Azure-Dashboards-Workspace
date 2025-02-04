@@ -42,7 +42,7 @@ export class MetricsContent implements ITileContent {
 
         if (isCustomMetric) {
             namespace = "microsoft.insights/components/kusto";
-            name =`customMetrics/${name}`
+            if (!name.includes('/')) name =`customMetrics/${name}`
         }
 
         const dashboardContent: IDashboardContent = {
