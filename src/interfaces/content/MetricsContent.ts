@@ -33,7 +33,7 @@ export class MetricsContent implements ITileContent {
     async exportToPartContent(): Promise<IDashboardContent> {
         var mappings = DashboardService.getDashboardAggregationMappings().map(kvp => { return { key: kvp.value, value: kvp.key } });
 
-        var aggregationType = mappings.find(kvp => kvp.key === this.aggregation)?.value;
+        var aggregationType = mappings.find(kvp => kvp.key === this.aggregation.toLowerCase())?.value;
 
         var namespace = this.namespace;
         var name = this.name;

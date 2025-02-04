@@ -151,11 +151,11 @@ export class DashboardServiceClass implements IDashboardService {
 
   getDashboardAggregationMappings(): { key: number, value: string }[] {
     return [
-      { key: 1, value: "Total" },
-      { key: 2, value: "Average" },
-      { key: 3, value: "Minimum" },
-      { key: 4, value: "Maximum" },
-      { key: 5, value: "Count" },
+      { key: 1, value: "total" },
+      { key: 2, value: "average" },
+      { key: 3, value: "minimum" },
+      { key: 4, value: "maximum" },
+      { key: 5, value: "count" },
     ];
   }
 
